@@ -14,15 +14,22 @@ const ChatApp = () => {
     setMessages((prevMessages) => [data, ...prevMessages]);
   };
   const handleUserUpdate = (userList) => {
-    console.log(userList);
     setUsers(userList);
   };
 
   const joinChat = () => {
     if (username.trim()) {
-      socketRef.current = io("http://localhost:5000");
-      socketRef.current.emit("join", username);
-      socketRef.current.on("message", handleNewMessage);
+      socketRef.current = io("http://localhost:5000", {
+        transports: ["websocket", "polling"],
+      });
+      socketRef.current.on("connect", () => {
+        socketRef.current.emit("join", username);
+      });
+      
+      socketRef.current.on("message", (data) => {
+        handleNewMessage(data);
+      });
+     
       socketRef.current.on("users", handleUserUpdate);
       setJoined(true);
     }
@@ -37,6 +44,10 @@ const ChatApp = () => {
 
   const logout = () => {
     if (socketRef.current) {
+      socketRef.current.off("message");
+      socketRef.current.off("history");
+      socketRef.current.off("users");
+      socketRef.current.off("connect");
       socketRef.current.disconnect(); 
       socketRef.current = null;
     }
@@ -98,6 +109,7 @@ const ChatApp = () => {
               onChange={(e) => setMessage(e.target.value)}
             />
             <button onClick={sendMessage}>Send</button>
+            <button onClick={() => socketRef.current?.emit("clearHistory")}>Clear</button>
           </div>
         </>
       )}
