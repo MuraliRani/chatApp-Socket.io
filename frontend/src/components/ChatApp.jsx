@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import io from "socket.io-client";
 
-
 const ChatApp = () => {
   const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState("");
   const [joined, setJoined] = useState(false);
-  const socketRef = useRef(null); 
+  const socketRef = useRef(null);
 
   const handleNewMessage = (data) => {
     setMessages((prevMessages) => [data, ...prevMessages]);
@@ -25,11 +24,11 @@ const ChatApp = () => {
       socketRef.current.on("connect", () => {
         socketRef.current.emit("join", username);
       });
-      
+
       socketRef.current.on("message", (data) => {
         handleNewMessage(data);
       });
-     
+
       socketRef.current.on("history", (history) => {
         if (Array.isArray(history)) {
           setMessages(history);
@@ -56,7 +55,7 @@ const ChatApp = () => {
       socketRef.current.off("history");
       socketRef.current.off("users");
       socketRef.current.off("connect");
-      socketRef.current.disconnect(); 
+      socketRef.current.disconnect();
       socketRef.current = null;
     }
     setUsername("");
@@ -65,7 +64,7 @@ const ChatApp = () => {
     setUsers([]);
   };
 
-  const onChangeUsername = useCallback((e) => setUsername(e.target.value),[])
+  const onChangeUsername = useCallback((e) => setUsername(e.target.value), []);
 
   return (
     <div className="chat-container">
@@ -117,7 +116,9 @@ const ChatApp = () => {
               onChange={(e) => setMessage(e.target.value)}
             />
             <button onClick={sendMessage}>Send</button>
-            <button onClick={() => socketRef.current?.emit("clearHistory")}>Clear</button>
+            <button onClick={() => socketRef.current?.emit("clearHistory")}>
+              Clear
+            </button>
           </div>
         </>
       )}
