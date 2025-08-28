@@ -30,6 +30,14 @@ const ChatApp = () => {
         handleNewMessage(data);
       });
      
+      socketRef.current.on("history", (history) => {
+        if (Array.isArray(history)) {
+          setMessages(history);
+        } else {
+          setMessages([]);
+        }
+      });
+
       socketRef.current.on("users", handleUserUpdate);
       setJoined(true);
     }

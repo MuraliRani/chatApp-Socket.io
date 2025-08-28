@@ -54,7 +54,7 @@ io.on("connection", async (socket) => {
   socket.on("clearHistory", async () => {
     try {
       await clearHistory();
-      socket.emit("history", []);
+      io.emit("history", []);
       io.emit("message", {
         username: "System",
         message: "Chat history cleared.",
